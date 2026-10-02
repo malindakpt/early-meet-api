@@ -1,1 +1,0 @@
-{"version":3,"file":"create-candidate.dto.d.ts","sourceRoot":"","sources":["../../../../src/api-modules/candidates/dto/create-candidate.dto.ts"],"names":[],"mappings":"AAEA,OAAO,EAAE,eAAe,EAAE,MAAM,gBAAgB,CAAC;AAEjD,qBAAa,kBAAkB;IAI7B,IAAI,EAAG,MAAM,CAAC;IAId,KAAK,EAAG,MAAM,CAAC;IAKf,KAAK,EAAG,MAAM,CAAC;IAGf,MAAM,EAAG,eAAe,CAAC;CAC1B"}

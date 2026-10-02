@@ -1,1 +1,0 @@
-{"version":3,"file":"update-technology-segment.dto.d.ts","sourceRoot":"","sources":["../../../../src/api-modules/technology-segments/dto/update-technology-segment.dto.ts"],"names":[],"mappings":"AAEA,OAAO,EAAE,uBAAuB,EAAE,MAAM,gBAAgB,CAAC;AAEzD,qBAAa,0BAA0B;IAKrC,IAAI,CAAC,EAAE,MAAM,CAAC;IAKd,WAAW,CAAC,EAAE,MAAM,CAAC;IAIrB,MAAM,CAAC,EAAE,uBAAuB,CAAC;CAClC"}
