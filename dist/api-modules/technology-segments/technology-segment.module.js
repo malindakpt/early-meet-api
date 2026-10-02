@@ -1,0 +1,27 @@
+"use strict";
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.TechnologySegmentModule = void 0;
+const common_1 = require("@nestjs/common");
+const auth_module_js_1 = require("../auth/auth.module.js");
+const technology_module_js_1 = require("../technologies/technology.module.js");
+const technology_segment_collection_controller_js_1 = require("./technology-segment-collection.controller.js");
+const technology_segment_controller_js_1 = require("./technology-segment.controller.js");
+const technology_segment_service_js_1 = require("./technology-segment.service.js");
+let TechnologySegmentModule = class TechnologySegmentModule {
+};
+exports.TechnologySegmentModule = TechnologySegmentModule;
+exports.TechnologySegmentModule = TechnologySegmentModule = __decorate([
+    (0, common_1.Module)({
+        imports: [auth_module_js_1.AuthModule, technology_module_js_1.TechnologyModule],
+        controllers: [technology_segment_collection_controller_js_1.TechnologySegmentCollectionController, technology_segment_controller_js_1.TechnologySegmentController],
+        providers: [technology_segment_service_js_1.TechnologySegmentService],
+        exports: [technology_segment_service_js_1.TechnologySegmentService],
+    })
+], TechnologySegmentModule);
+//# sourceMappingURL=technology-segment.module.js.map
