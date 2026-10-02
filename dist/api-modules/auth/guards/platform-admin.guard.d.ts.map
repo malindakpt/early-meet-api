@@ -1,0 +1,1 @@
+{"version":3,"file":"platform-admin.guard.d.ts","sourceRoot":"","sources":["../../../../src/api-modules/auth/guards/platform-admin.guard.ts"],"names":[],"mappings":"AAAA,OAAO,EAAE,WAAW,EAAE,gBAAgB,EAAkC,MAAM,gBAAgB,CAAC;AAI/F,qBACa,kBAAmB,YAAW,WAAW;IACpD,WAAW,CAAC,OAAO,EAAE,gBAAgB,GAAG,OAAO;CAOhD"}

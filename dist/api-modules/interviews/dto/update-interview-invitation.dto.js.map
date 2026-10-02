@@ -1,0 +1,1 @@
+{"version":3,"file":"update-interview-invitation.dto.js","sourceRoot":"","sources":["../../../../src/api-modules/interviews/dto/update-interview-invitation.dto.ts"],"names":[],"mappings":";;;;;;;;;;;;;AAAA,qDAAyC;AAEzC,2CAAkD;AAElD,MAAa,4BAA4B;IAEvC,MAAM,CAAoB;CAC3B;AAHD,oEAGC;AADC;IADC,IAAA,wBAAM,EAAC,yBAAgB,CAAC;kDAChB,yBAAgB,oBAAhB,yBAAgB;4DAAC"}

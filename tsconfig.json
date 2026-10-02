@@ -1,0 +1,16 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "composite": true,
+    "declaration": true,
+    "declarationMap": true,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "sourceMap": true,
+    "outDir": "dist",
+    "rootDir": "src",
+    "tsBuildInfoFile": "dist/tsconfig.tsbuildinfo"
+  },
+  "include": ["src/**/*.ts"],
+  "exclude": ["dist", "node_modules"]
+}

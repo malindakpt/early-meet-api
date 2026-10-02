@@ -1,0 +1,1 @@
+{"version":3,"file":"business-email-domain.service.d.ts","sourceRoot":"","sources":["../../../src/api-modules/auth/business-email-domain.service.ts"],"names":[],"mappings":"AAgBA,qBACa,0BAA0B;IACrC,cAAc,CAAC,KAAK,EAAE,MAAM,GAAG,MAAM;IAIrC,SAAS,CAAC,KAAK,EAAE,MAAM,GAAG,MAAM;IAIhC,gBAAgB,CAAC,MAAM,EAAE,MAAM,GAAG,OAAO;CAG1C"}

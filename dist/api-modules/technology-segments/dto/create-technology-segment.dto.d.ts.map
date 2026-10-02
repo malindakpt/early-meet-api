@@ -1,0 +1,1 @@
+{"version":3,"file":"create-technology-segment.dto.d.ts","sourceRoot":"","sources":["../../../../src/api-modules/technology-segments/dto/create-technology-segment.dto.ts"],"names":[],"mappings":"AAEA,OAAO,EAAE,uBAAuB,EAAE,MAAM,gBAAgB,CAAC;AAEzD,qBAAa,0BAA0B;IAIrC,IAAI,EAAG,MAAM,CAAC;IAId,WAAW,EAAG,MAAM,CAAC;IAGrB,MAAM,EAAG,uBAAuB,CAAC;CAClC"}

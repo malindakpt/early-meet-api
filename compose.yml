@@ -1,0 +1,30 @@
+# Runs the production API image locally. Self-contained in apps/api so the API can move to its own
+# repository; it does not start PostgreSQL. Use any reachable database (for example the monorepo's
+# `npm run db:up`, which publishes PostgreSQL on the host).
+#   docker compose -f apps/api/compose.yml up --build      (from the repository root)
+#   docker compose up --build                              (from apps/api)
+name: interview-platform-api
+
+services:
+  api:
+    build:
+      # Monorepo root: holds the npm workspace lockfile. Change to `.` once the API has its own repo.
+      context: ../..
+      dockerfile: apps/api/Dockerfile
+    image: interview-platform-api:local
+    # Application settings (AUTH_SECRET, OPENAI_*, SMTP_*, CORS_ORIGIN, ...) come from the ignored
+    # API env file at runtime; nothing is baked into the image.
+    env_file:
+      - path: .env
+        required: false
+    environment:
+      NODE_ENV: production
+      PORT: 3001
+      # `localhost` inside the container is the container itself, so reach the host-published
+      # database through host.docker.internal. Set DOCKER_DATABASE_URL to use another database.
+      DATABASE_URL: ${DOCKER_DATABASE_URL:-postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@host.docker.internal:${POSTGRES_PORT:-5432}/${POSTGRES_DB}?schema=public}
+    extra_hosts:
+      # Needed on Linux; Docker Desktop provides host.docker.internal automatically.
+      - 'host.docker.internal:host-gateway'
+    ports:
+      - '${API_PORT:-3001}:3001'

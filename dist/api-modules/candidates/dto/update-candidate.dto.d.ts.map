@@ -1,0 +1,1 @@
+{"version":3,"file":"update-candidate.dto.d.ts","sourceRoot":"","sources":["../../../../src/api-modules/candidates/dto/update-candidate.dto.ts"],"names":[],"mappings":"AAEA,OAAO,EAAE,eAAe,EAAE,MAAM,gBAAgB,CAAC;AAEjD,qBAAa,kBAAkB;IAK7B,IAAI,CAAC,EAAE,MAAM,CAAC;IAKd,KAAK,CAAC,EAAE,MAAM,CAAC;IAMf,KAAK,CAAC,EAAE,MAAM,CAAC;IAIf,MAAM,CAAC,EAAE,eAAe,CAAC;CAC1B"}

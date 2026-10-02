@@ -1,0 +1,3 @@
+ALTER TABLE "Vacancy" ADD COLUMN "experienceAreas" TEXT[] NOT NULL DEFAULT ARRAY[]::TEXT[];
+
+ALTER TYPE "ExperienceCompetencyGenerationStage" ADD VALUE IF NOT EXISTS 'SAVING_AREAS';

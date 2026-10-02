@@ -1,0 +1,1 @@
+{"version":3,"file":"submit-public-application.dto.d.ts","sourceRoot":"","sources":["../../../../src/api-modules/vacancy-candidates/dto/submit-public-application.dto.ts"],"names":[],"mappings":"AAIA,qBAAa,+BAA+B;IAG1C,KAAK,EAAG,MAAM,CAAC;CAChB;AAID,qBAAa,0BAA0B;IAGrC,KAAK,EAAG,MAAM,CAAC;IAKf,QAAQ,EAAG,MAAM,CAAC;IAKlB,aAAa,EAAG,MAAM,CAAC;CACxB"}

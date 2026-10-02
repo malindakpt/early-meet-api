@@ -1,0 +1,31 @@
+# Build-context exclusions for apps/api/Dockerfile. BuildKit reads <Dockerfile>.dockerignore
+# before the context root .dockerignore; patterns are relative to the build context (repo root).
+# Rename to .dockerignore if the API moves to its own repository.
+
+# Dependencies and build output (rebuilt inside the image)
+**/node_modules
+**/dist
+**/.next
+**/.test-dist
+**/coverage
+**/*.tsbuildinfo
+
+# Environment files and local secrets
+**/.env
+**/.env.*
+!**/.env.example
+
+# VCS, CI, and AI-agent configuration
+.git
+.github
+.claude
+
+# IDE and operating system files
+.vscode
+.idea
+**/.DS_Store
+
+# Logs and temporary files
+**/*.log
+**/tmp
+**/.tmp

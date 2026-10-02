@@ -1,0 +1,1 @@
+{"version":3,"file":"update-vacancy-custom-question.dto.d.ts","sourceRoot":"","sources":["../../../../src/api-modules/vacancy-question-generation/dto/update-vacancy-custom-question.dto.ts"],"names":[],"mappings":"AAGA,qBAAa,8BAA8B;IAKzC,YAAY,CAAC,EAAE,MAAM,CAAC;IAKtB,kBAAkB,CAAC,EAAE,MAAM,GAAG,IAAI,CAAC;IAMnC,YAAY,CAAC,EAAE,MAAM,CAAC;CACvB"}

@@ -1,0 +1,564 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum UserRole {
+  PLATFORM_ADMIN
+  HR
+}
+
+enum OrganizationStatus {
+  ACTIVE
+  INACTIVE
+  SUSPENDED
+}
+
+enum UserStatus {
+  ACTIVE
+  INACTIVE
+  SUSPENDED
+}
+
+enum TechnologyStatus {
+  ACTIVE
+  INACTIVE
+}
+
+enum TechnologySegmentStatus {
+  ACTIVE
+  INACTIVE
+}
+
+enum QuestionStatus {
+  PENDING
+  APPROVED
+  ARCHIVED
+}
+
+enum Difficulty {
+  BEGINNER
+  INTERMEDIATE
+  ADVANCED
+  EXPERT
+}
+
+enum RequirementType {
+  REQUIRED
+  PREFERRED
+}
+
+enum AssessmentAreaImportance {
+  HIGH
+  MEDIUM
+  LOW
+}
+
+enum ExperienceCompetencyGenerationStatus {
+  QUEUED
+  PROCESSING
+  COMPLETED
+  FAILED
+}
+
+enum ExperienceCompetencyGenerationStage {
+  PREPARING
+  ANALYZING_JOB
+  IDENTIFYING_FOCUS_AREAS
+  GENERATING_PLAN
+  VALIDATING_RESULT
+  SAVING_RESULT
+  GENERATING_QUESTIONS
+  VALIDATING_QUESTIONS
+  FINALIZING_PLAN
+  SAVING_AREAS
+  COMPLETED
+}
+
+enum EmploymentType {
+  FULL_TIME
+  PART_TIME
+  CONTRACT
+  TEMPORARY
+  INTERNSHIP
+}
+
+enum WorkType {
+  ONSITE
+  REMOTE
+  HYBRID
+}
+
+enum VacancyStatus {
+  DRAFT
+  ACTIVE
+  CLOSED
+  ARCHIVED
+}
+
+enum InterviewType {
+  TECHNICAL
+  BEHAVIORAL
+  SYSTEM_DESIGN
+}
+
+enum CandidateStatus {
+  ACTIVE
+  INACTIVE
+}
+
+enum CandidateProcessingStatus {
+  UPLOADED
+  AI_PROCESSING
+  FAILED
+  READY
+}
+
+enum AiMatchStatus {
+  NOT_REQUESTED
+  QUEUED
+  PROCESSING
+  COMPLETED
+  FAILED
+}
+
+enum CandidateDecision {
+  KEEP_IN_REVIEW
+  SHORTLISTED
+  REJECTED
+  SELECTED
+}
+
+enum InvitationStatus {
+  PENDING
+  SENT
+  OPENED
+  COMPLETED
+  EXPIRED
+  CANCELLED
+}
+
+enum InterviewSessionStatus {
+  NOT_STARTED
+  IN_PROGRESS
+  COMPLETED
+  EXPIRED
+}
+
+enum InterviewEvaluationStatus {
+  NOT_STARTED
+  EVALUATING
+  EVALUATED
+  FAILED
+}
+
+enum InterviewQuestionStatus {
+  PENDING
+  ASKED
+  ANSWERED
+}
+
+enum InterviewRecommendation {
+  STRONGLY_RECOMMENDED
+  RECOMMENDED
+  CONSIDER
+  NOT_RECOMMENDED
+}
+
+model Organization {
+  id          String             @id @default(uuid()) @db.Uuid
+  name        String             @db.VarChar(255)
+  emailDomain String             @unique @db.VarChar(255)
+  status      OrganizationStatus
+  createdAt   DateTime           @default(now()) @db.Timestamptz()
+  updatedAt   DateTime           @updatedAt @db.Timestamptz()
+  departments Department[]
+  users       User[]
+  vacancies   Vacancy[]
+}
+
+model Department {
+  id             String       @id @default(uuid()) @db.Uuid
+  name           String       @db.VarChar(255)
+  organizationId String       @db.Uuid
+  createdAt      DateTime     @default(now()) @db.Timestamptz()
+  updatedAt      DateTime     @updatedAt @db.Timestamptz()
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Restrict)
+  vacancies      Vacancy[]
+
+  @@unique([organizationId, name])
+  @@index([organizationId])
+}
+
+model User {
+  id                 String                @id @default(uuid()) @db.Uuid
+  organizationId     String                @db.Uuid
+  name               String                @db.VarChar(255)
+  email              String                @unique @db.VarChar(255)
+  role               UserRole
+  emailVerified      Boolean
+  status             UserStatus
+  createdAt          DateTime              @default(now()) @db.Timestamptz()
+  updatedAt          DateTime              @updatedAt @db.Timestamptz()
+  organization       Organization          @relation(fields: [organizationId], references: [id], onDelete: Restrict)
+  credentials        UserCredentials?
+  createdInvitations InterviewInvitation[] @relation("InvitationCreator")
+  createdVacancies   Vacancy[]             @relation("VacancyCreator")
+  createdQuestions   Question[]            @relation("QuestionCreator")
+
+  @@index([organizationId])
+  @@index([email])
+}
+
+model UserCredentials {
+  id                         String    @id @default(uuid()) @db.Uuid
+  userId                     String    @unique @db.Uuid
+  passwordHash               String    @db.VarChar(255)
+  verificationTokenHash      String?   @unique @db.VarChar(255)
+  verificationTokenExpiresAt DateTime? @db.Timestamptz()
+  refreshTokenHash           String?   @unique @db.VarChar(255)
+  refreshTokenExpiresAt      DateTime? @db.Timestamptz()
+  createdAt                  DateTime  @default(now()) @db.Timestamptz()
+  updatedAt                  DateTime  @updatedAt @db.Timestamptz()
+  user                       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Vacancy {
+  id                     String                           @id @default(uuid()) @db.Uuid
+  organizationId         String                           @db.Uuid
+  createdBy              String                           @db.Uuid
+  departmentId           String?                          @db.Uuid
+  title                  String                           @db.VarChar(255)
+  location               String                           @db.VarChar(255)
+  employmentType         EmploymentType
+  workType               WorkType
+  jobDescription         String                           @db.Text
+  experienceMin          Int
+  experienceMax          Int
+  deadline               DateTime                         @db.Timestamptz()
+  interviewType          InterviewType
+  difficulty             Difficulty
+  status                 VacancyStatus
+  notes                  String                           @db.Text
+  publicApplicationToken String                           @unique @default(dbgenerated("encode(gen_random_bytes(32), 'hex')")) @db.VarChar(64)
+  experienceAreas        String[]                         @default([])
+  createdAt              DateTime                         @default(now()) @db.Timestamptz()
+  updatedAt              DateTime                         @updatedAt @db.Timestamptz()
+  organization           Organization                     @relation(fields: [organizationId], references: [id], onDelete: Restrict)
+  createdByUser          User                             @relation("VacancyCreator", fields: [createdBy], references: [id], onDelete: Restrict)
+  department             Department?                      @relation(fields: [departmentId], references: [id], onDelete: Restrict)
+  candidates             VacancyCandidate[]
+  invitations            InterviewInvitation[]
+  questions              VacancyQuestion[]
+  customQuestions        VacancyCustomQuestion[]
+  experienceAreaRecords  VacancyExperienceArea[]
+  experienceGenerations  ExperienceCompetencyGeneration[]
+  sessions               InterviewSession[]
+  technologies           VacancyTechnology[]
+
+  @@index([organizationId])
+  @@index([createdBy])
+  @@index([departmentId])
+  @@index([status])
+  @@index([deadline])
+}
+
+model Technology {
+  id          String              @id @default(uuid()) @db.Uuid
+  name        String              @unique @db.VarChar(255)
+  description String              @db.Text
+  status      TechnologyStatus
+  createdAt   DateTime            @default(now()) @db.Timestamptz()
+  updatedAt   DateTime            @updatedAt @db.Timestamptz()
+  questions   Question[]
+  segments    TechnologySegment[]
+  vacancies   VacancyTechnology[]
+}
+
+model TechnologySegment {
+  id           String                  @id @default(uuid()) @db.Uuid
+  technologyId String                  @db.Uuid
+  name         String                  @db.VarChar(255)
+  description  String                  @db.Text
+  status       TechnologySegmentStatus
+  createdAt    DateTime                @default(now()) @db.Timestamptz()
+  updatedAt    DateTime                @updatedAt @db.Timestamptz()
+  technology   Technology              @relation(fields: [technologyId], references: [id], onDelete: Restrict)
+  questions    Question[]
+
+  @@unique([technologyId, name])
+  @@index([technologyId])
+}
+
+model VacancyTechnology {
+  id                String          @id @default(uuid()) @db.Uuid
+  vacancyId         String          @db.Uuid
+  technologyId      String          @db.Uuid
+  segmentSelections String[]        @default([])
+  requirementType   RequirementType
+  createdAt         DateTime        @default(now()) @db.Timestamptz()
+  updatedAt         DateTime        @updatedAt @db.Timestamptz()
+  technology        Technology      @relation(fields: [technologyId], references: [id], onDelete: Restrict)
+  vacancy           Vacancy         @relation(fields: [vacancyId], references: [id], onDelete: Restrict)
+
+  @@unique([vacancyId, technologyId, requirementType])
+  @@index([vacancyId])
+  @@index([technologyId])
+}
+
+model Question {
+  id                         String            @id @default(uuid()) @db.Uuid
+  createdByUserId            String?           @db.Uuid
+  technologyId               String            @db.Uuid
+  technologySegmentId        String            @db.Uuid
+  difficulty                 Difficulty
+  questionType               String            @db.VarChar(50)
+  estimatedAnswerTimeSeconds Int
+  followUpAllowed            Boolean
+  status                     QuestionStatus
+  questionText               String            @db.Text
+  evaluationCriteria         Json              @db.JsonB
+  metaData                   Json              @db.JsonB
+  createdAt                  DateTime          @default(now()) @db.Timestamptz()
+  updatedAt                  DateTime          @updatedAt @db.Timestamptz()
+  createdByUser              User?             @relation("QuestionCreator", fields: [createdByUserId], references: [id], onDelete: Restrict)
+  technologySegment          TechnologySegment @relation(fields: [technologySegmentId], references: [id], onDelete: Restrict)
+  technology                 Technology        @relation(fields: [technologyId], references: [id], onDelete: Restrict)
+  vacancyQuestions           VacancyQuestion[]
+
+  @@index([technologyId])
+  @@index([technologySegmentId])
+  @@index([createdByUserId])
+  @@index([difficulty])
+  @@index([status])
+}
+
+model VacancyQuestion {
+  id                 String                    @id @default(uuid()) @db.Uuid
+  vacancyId          String                    @db.Uuid
+  questionId         String                    @db.Uuid
+  sequence           Int
+  questionText       String                    @db.Text
+  difficulty         Difficulty
+  questionType       String                    @db.VarChar(50)
+  followUpAllowed    Boolean
+  evaluationCriteria Json                      @db.JsonB
+  createdAt          DateTime                  @default(now()) @db.Timestamptz()
+  updatedAt          DateTime                  @updatedAt @db.Timestamptz()
+  question           Question                  @relation(fields: [questionId], references: [id], onDelete: Restrict)
+  vacancy            Vacancy                   @relation(fields: [vacancyId], references: [id], onDelete: Restrict)
+  answers            InterviewQuestionAnswer[]
+
+  @@unique([vacancyId, sequence])
+  @@unique([vacancyId, questionId])
+  @@index([vacancyId])
+  @@index([sequence])
+}
+
+model VacancyCustomQuestion {
+  id                 String                    @id @default(uuid()) @db.Uuid
+  vacancyId          String                    @db.Uuid
+  questionText       String                    @db.Text
+  evaluationCriteria String?                   @db.Text
+  displayOrder       Int
+  createdAt          DateTime                  @default(now()) @db.Timestamptz()
+  updatedAt          DateTime                  @updatedAt @db.Timestamptz()
+  answers            InterviewQuestionAnswer[]
+  vacancy            Vacancy                   @relation(fields: [vacancyId], references: [id], onDelete: Cascade)
+
+  @@unique([vacancyId, displayOrder])
+  @@index([vacancyId])
+  @@index([vacancyId, displayOrder])
+}
+
+model VacancyExperienceArea {
+  id              String                      @id @default(uuid()) @db.Uuid
+  vacancyId       String                      @db.Uuid
+  name            String                      @db.VarChar(120)
+  importance      AssessmentAreaImportance
+  reason          String                      @db.Text
+  whatToEstablish Json                        @db.JsonB
+  sequence        Int
+  createdAt       DateTime                    @default(now()) @db.Timestamptz()
+  updatedAt       DateTime                    @updatedAt @db.Timestamptz()
+  vacancy         Vacancy                     @relation(fields: [vacancyId], references: [id], onDelete: Restrict)
+  questions       VacancyExperienceQuestion[]
+
+  @@unique([vacancyId, sequence])
+  @@index([vacancyId])
+}
+
+model VacancyExperienceQuestion {
+  id           String                @id @default(uuid()) @db.Uuid
+  areaId       String                @db.Uuid
+  questionText String                @db.Text
+  sequence     Int
+  createdAt    DateTime              @default(now()) @db.Timestamptz()
+  updatedAt    DateTime              @updatedAt @db.Timestamptz()
+  area         VacancyExperienceArea @relation(fields: [areaId], references: [id], onDelete: Restrict)
+
+  @@unique([areaId, sequence])
+  @@index([areaId])
+}
+
+model ExperienceCompetencyGeneration {
+  id           String                               @id @default(uuid()) @db.Uuid
+  vacancyId    String                               @db.Uuid
+  status       ExperienceCompetencyGenerationStatus
+  stage        ExperienceCompetencyGenerationStage
+  progress     Int
+  message      String                               @db.VarChar(255)
+  result       Json?
+  areaProgress Json?
+  error        String?                              @db.VarChar(255)
+  startedAt    DateTime?                            @db.Timestamptz()
+  completedAt  DateTime?                            @db.Timestamptz()
+  createdAt    DateTime                             @default(now()) @db.Timestamptz()
+  updatedAt    DateTime                             @updatedAt @db.Timestamptz()
+  vacancy      Vacancy                              @relation(fields: [vacancyId], references: [id], onDelete: Restrict)
+
+  @@index([vacancyId, createdAt])
+  @@index([vacancyId, status])
+}
+
+model Candidate {
+  id                String                    @id @default(uuid()) @db.Uuid
+  // Set at CV upload to the email (or the upload date and time when there is no email) and
+  // replaced by the extracted name when HR calculates the AI CV match.
+  name              String                    @db.VarChar(255)
+  email             String?                   @db.VarChar(255)
+  phone             String                    @default("") @db.VarChar(50)
+  status            CandidateStatus           @default(ACTIVE)
+  processingStatus  CandidateProcessingStatus @default(READY)
+  cvFileName        String?                   @db.VarChar(255)
+  cvExtractedText   String?                   @db.Text
+  cvExtractedData   Json?
+  cvProcessingError String?                   @db.Text
+  createdAt         DateTime                  @default(now()) @db.Timestamptz()
+  updatedAt         DateTime                  @updatedAt @db.Timestamptz()
+  invitations       InterviewInvitation[]
+  sessions          InterviewSession[]
+  vacancies         VacancyCandidate[]
+
+  @@index([email])
+  @@index([processingStatus])
+}
+
+model VacancyCandidate {
+  id                       String            @id @default(uuid()) @db.Uuid
+  candidateId              String            @db.Uuid
+  vacancyId                String            @db.Uuid
+  vacancyMatchScore        Decimal           @db.Decimal(5, 2)
+  keywordMatchScore        Decimal?          @db.Decimal(5, 2)
+  keywordMatchCalculatedAt DateTime?         @db.Timestamptz()
+  keywordMatchBreakdown    Json?             @db.JsonB
+  aiMatchScore             Decimal?          @db.Decimal(5, 2)
+  aiMatchStatus            AiMatchStatus     @default(NOT_REQUESTED)
+  aiMatchStartedAt         DateTime?         @db.Timestamptz()
+  aiMatchCompletedAt       DateTime?         @db.Timestamptz()
+  aiMatchError             String?           @db.Text
+  requiredTechnologiesMet  String[]
+  preferredTechnologiesMet String[]
+  strengths                String[]
+  gaps                     String[]
+  decision                 CandidateDecision
+  summary                  String            @db.Text
+  notes                    String            @db.Text
+  createdAt                DateTime          @default(now()) @db.Timestamptz()
+  updatedAt                DateTime          @updatedAt @db.Timestamptz()
+  candidate                Candidate         @relation(fields: [candidateId], references: [id], onDelete: Restrict)
+  vacancy                  Vacancy           @relation(fields: [vacancyId], references: [id], onDelete: Restrict)
+
+  @@unique([candidateId, vacancyId])
+  @@index([vacancyId])
+  @@index([candidateId])
+  @@index([vacancyMatchScore])
+  @@index([keywordMatchScore])
+  @@index([aiMatchScore])
+  @@index([aiMatchStatus])
+  @@index([decision])
+}
+
+model InterviewInvitation {
+  id          String            @id @default(uuid()) @db.Uuid
+  candidateId String            @db.Uuid
+  vacancyId   String            @db.Uuid
+  tokenHash   String            @unique @db.VarChar(255)
+  sentAt      DateTime?         @db.Timestamptz()
+  expiresAt   DateTime          @db.Timestamptz()
+  status      InvitationStatus
+  createdBy   String            @db.Uuid
+  createdAt   DateTime          @default(now()) @db.Timestamptz()
+  updatedAt   DateTime          @updatedAt @db.Timestamptz()
+  candidate   Candidate         @relation(fields: [candidateId], references: [id], onDelete: Restrict)
+  creator     User              @relation("InvitationCreator", fields: [createdBy], references: [id], onDelete: Restrict)
+  session     InterviewSession?
+  vacancy     Vacancy           @relation(fields: [vacancyId], references: [id], onDelete: Restrict)
+
+  @@index([candidateId])
+  @@index([vacancyId])
+  @@index([tokenHash])
+  @@index([status])
+  @@index([expiresAt])
+}
+
+model InterviewSession {
+  id                    String                    @id @default(uuid()) @db.Uuid
+  invitationId          String                    @unique @db.Uuid
+  candidateId           String                    @db.Uuid
+  vacancyId             String                    @db.Uuid
+  status                InterviewSessionStatus
+  evaluationStatus      InterviewEvaluationStatus @default(NOT_STARTED)
+  evaluationStartedAt   DateTime?                 @db.Timestamptz()
+  candidateIntelligence Json?                     @db.JsonB
+  overallScore          Decimal?                  @db.Decimal(5, 2)
+  startedAt             DateTime?                 @db.Timestamptz()
+  completedAt           DateTime?                 @db.Timestamptz()
+  summary               String?                   @db.Text
+  recommendation        InterviewRecommendation?
+  evaluatedAt           DateTime?                 @db.Timestamptz()
+  createdAt             DateTime                  @default(now()) @db.Timestamptz()
+  updatedAt             DateTime                  @updatedAt @db.Timestamptz()
+  answers               InterviewQuestionAnswer[]
+  candidate             Candidate                 @relation(fields: [candidateId], references: [id], onDelete: Restrict)
+  invitation            InterviewInvitation       @relation(fields: [invitationId], references: [id], onDelete: Restrict)
+  vacancy               Vacancy                   @relation(fields: [vacancyId], references: [id], onDelete: Restrict)
+
+  @@index([invitationId])
+  @@index([candidateId])
+  @@index([vacancyId])
+  @@index([status])
+  @@index([evaluationStatus])
+}
+
+model InterviewQuestionAnswer {
+  id                      String                    @id @default(uuid()) @db.Uuid
+  sequence                Int
+  interviewSessionId      String                    @db.Uuid
+  vacancyQuestionId       String?                   @db.Uuid
+  vacancyCustomQuestionId String?                   @db.Uuid
+  followUpFromId          String?                   @db.Uuid
+  status                  InterviewQuestionStatus
+  questionText            String                    @db.Text
+  answerText              String?                   @db.Text
+  askedAt                 DateTime?                 @db.Timestamptz()
+  answeredAt              DateTime?                 @db.Timestamptz()
+  score                   Decimal?                  @db.Decimal(5, 2)
+  explanation             String?                   @db.Text
+  createdAt               DateTime                  @default(now()) @db.Timestamptz()
+  updatedAt               DateTime                  @updatedAt @db.Timestamptz()
+  followUpFrom            InterviewQuestionAnswer?  @relation("QuestionAnswerFollowUp", fields: [followUpFromId], references: [id], onDelete: Restrict)
+  followUps               InterviewQuestionAnswer[] @relation("QuestionAnswerFollowUp")
+  interviewSession        InterviewSession          @relation(fields: [interviewSessionId], references: [id], onDelete: Restrict)
+  vacancyQuestion         VacancyQuestion?          @relation(fields: [vacancyQuestionId], references: [id], onDelete: Restrict)
+  vacancyCustomQuestion   VacancyCustomQuestion?    @relation(fields: [vacancyCustomQuestionId], references: [id], onDelete: Restrict)
+
+  @@index([interviewSessionId])
+  @@index([vacancyQuestionId])
+  @@index([vacancyCustomQuestionId])
+  @@index([followUpFromId])
+  @@index([sequence])
+}
