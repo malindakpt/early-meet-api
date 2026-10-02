@@ -4,6 +4,7 @@
   "private": true,
   "description": "NestJS API for the AI Interview Platform",
   "scripts": {
+    "prebuild": "prisma generate",
     "build": "tsc --project tsconfig.build.json",
     "start:dev": "nest start --watch",
     "start": "node dist/main.js",
