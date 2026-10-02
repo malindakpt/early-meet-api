@@ -17,7 +17,12 @@
     "prisma:migrate:status": "prisma migrate status",
     "test": "npm run test:unit && npm run test:integration",
     "test:integration": "npm run build && node --test test/*.integration.mjs",
-    "test:unit": "npm run build && node --test test/*.unit.mjs"
+    "test:unit": "npm run build && node --test test/*.unit.mjs",
+    "db:up": "docker compose up --detach --wait postgres",
+    "db:down": "docker compose down",
+    "db:logs": "docker compose logs --follow postgres",
+    "db:reset": "docker compose down --volumes --remove-orphans",
+    "prisma:studio": "prisma studio"
   },
   "dependencies": {
     "@nestjs/common": "^11.1.11",

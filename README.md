@@ -6,6 +6,32 @@ NestJS uses Express through its default adapter unless explicitly configured oth
 
 See [backend architecture](../../docs/architecture/backend.md).
 
+## Local Database
+
+All database configuration lives in this folder: the Prisma schema and migrations in [prisma/](prisma), [prisma.config.ts](prisma.config.ts), the `postgres` service in [compose.yml](compose.yml), and the `POSTGRES_*`/`DATABASE_URL` settings in [.env.example](.env.example). Compose and Prisma both read the ignored `apps/api/.env`.
+
+Run these from `apps/api` (or from the repository root with `--workspace=@ai-interview-platform/api`):
+
+1. Copy `.env.example` to `.env` and change `POSTGRES_PASSWORD` before use.
+2. Start PostgreSQL 16 and wait for it to be healthy:
+
+   ```bash
+   npm run db:up
+   ```
+
+3. Apply Prisma migrations, then start the API:
+
+   ```bash
+   npm run prisma:migrate:dev
+   npm run start:dev
+   ```
+
+Useful commands: `npm run db:logs`, `npm run db:down`, `npm run prisma:studio`, `npm run prisma:migrate:status`, and `npm run db:reset`.
+
+`db:reset` deletes the named local PostgreSQL volume and all local database data. Do not use it for a shared or production database. Do not commit `.env` or place real credentials in Compose files.
+
+If PostgreSQL is unreachable, the API still starts and prints a `DATABASE NOT CONNECTED` banner; database-backed endpoints fail and `GET /api/v1/health` returns `503` until it is reachable.
+
 ## Production Build
 
 ```bash
@@ -33,10 +59,10 @@ docker build -f apps/api/Dockerfile -t interview-platform-api .   # from the rep
 
 ### Run locally
 
-`compose.yml` runs only the API; it does not start PostgreSQL. It reads `apps/api/.env` and connects to the database published on the host (for example by the monorepo's `npm run db:up`) through `host.docker.internal`, building `DATABASE_URL` from `POSTGRES_USER`, `POSTGRES_PASSWORD`, `POSTGRES_PORT`, and `POSTGRES_DB`. Set `DOCKER_DATABASE_URL` to use another database, and `API_PORT` to change the published host port.
+The `api` service in `compose.yml` reads `apps/api/.env` and connects to the database published on the host (for example by `npm run db:up`) through `host.docker.internal`, building `DATABASE_URL` from `POSTGRES_USER`, `POSTGRES_PASSWORD`, `POSTGRES_PORT`, and `POSTGRES_DB`. Set `DOCKER_DATABASE_URL` to use another database, and `API_PORT` to change the published host port.
 
 ```bash
-docker compose -f apps/api/compose.yml up --build --detach   # from the repository root
+docker compose -f apps/api/compose.yml up --build --detach api   # from the repository root
 docker compose -f apps/api/compose.yml logs --follow api
 docker compose -f apps/api/compose.yml down                  # stop and remove the container
 ```

@@ -1,11 +1,28 @@
-# Runs the production API image locally. Self-contained in apps/api so the API can move to its own
-# repository; it does not start PostgreSQL. Use any reachable database (for example the monorepo's
-# `npm run db:up`, which publishes PostgreSQL on the host).
+# Local containers for the API. Self-contained in apps/api so the API can move to its own
+# repository. Compose reads POSTGRES_* and other substitutions from apps/api/.env.
+#   npm run db:up                                          (PostgreSQL only, for host-run development)
 #   docker compose -f apps/api/compose.yml up --build      (from the repository root)
 #   docker compose up --build                              (from apps/api)
 name: interview-platform-api
 
 services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:?Set POSTGRES_DB in apps/api/.env}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in apps/api/.env}
+      POSTGRES_USER: ${POSTGRES_USER:?Set POSTGRES_USER in apps/api/.env}
+    ports:
+      - '${POSTGRES_PORT:-5432}:5432'
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB']
+      interval: 5s
+      timeout: 3s
+      retries: 10
+      start_period: 5s
+
   api:
     build:
       # Monorepo root: holds the npm workspace lockfile. Change to `.` once the API has its own repo.
@@ -28,3 +45,9 @@ services:
       - 'host.docker.internal:host-gateway'
     ports:
       - '${API_PORT:-3001}:3001'
+
+volumes:
+  postgres-data:
+    # Pinned to the volume the former root compose.yml created, so existing local data survives
+    # the move. Rename freely in a fresh checkout.
+    name: interviewplatform_postgres-data
